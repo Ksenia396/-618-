@@ -14,7 +14,7 @@ struct Bolt
   float Z; //координата з
 };
 //объявление болтов
-Bolt bolts[16]
+Bolt bolts[16];
 
 void setup() {
   pinMode( dirPinX, OUTPUT);
@@ -130,5 +130,5 @@ void loop() {
       // Передать координаты в функцию движения
       setCoord(bolt.X, bolt.Z);
     }
-
+  }
 }
