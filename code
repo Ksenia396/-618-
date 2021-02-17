@@ -74,7 +74,7 @@ void setup() {
 }
 
 Bolt getBolt(input) {
-  return bolts[input - 1]
+  return bolts[input - 1];
 }
 
 void move(int dirPin, int stepPin, float coord) {
