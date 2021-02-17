@@ -1,0 +1,134 @@
+#define dirPinX 2
+#define stepPinX 3
+#define dirPinZ 4
+#define stepPinZ 5
+#define endButX 11
+#define endButZ 12
+#define stepsPerRevolution 200 //Для одного оборота
+#define revLength 5 // Длина одного оборота
+
+// Структура, опис. расположение болта
+struct Bolt
+{
+  float X; //координата х 
+  float Z; //координата з
+};
+//объявление болтов
+Bolt bolts[16]
+
+void setup() {
+  pinMode( dirPinX, OUTPUT);
+  pinMode( stepPinX, OUTPUT);
+  pinMode( dirPinZ, OUTPUT);
+  pinMode( stepPinZ, OUTPUT);
+  pinMode( endButX, INPUT);
+  pinMode( endButZ, INPUT);
+  
+  bolts[0].X = 60.1;
+  bolts[0].Z = 135.1;
+  
+  bolts[1].X = bolts[0].X;
+  bolts[1].Z = 14.9;
+
+  bolts[2].X = -bolts[1].X;
+  bolts[2].Z = bolts[1].Z;
+
+  bolts[3].X = -bolts[0].X;
+  bolts[3].X = bolts[0].Z;
+
+  bolts[4].X = 0;
+  bolts[4].Z = 132;
+
+  bolts[5].X = 40.3;
+  bolts[5].Z = 115.3;
+
+  bolts[6].X = 57;
+  bolts[6].Z = 75;
+
+  bolts[7].X = bolts[5].X;
+  bolts[7].Z = 34.7;
+
+  bolts[8].X= 0;
+  bolts[8].Z = 18;
+
+  bolts[9].X = -bolts[7].X;
+  bolts[9].Z = bolts[7].Z;
+
+  bolts[10].X = -bolts[6].X;
+  bolts[10].Z = bolts[6].Z;
+
+  bolts[11].X = -bolts[5].X ;
+  bolts[11].Z = bolts[5].Z;
+
+  bolts[12].X = 0;
+  bolts[12].Z = 100;
+
+  bolts[13].X = 25;
+  bolts[13].Z = bolts[6].Z;
+
+  bolts[14].X = 0;
+  bolts[14].Z = 50;
+
+  bolts[15].X = -bolts[13].X;
+  bolts[15].Z = bolts[6].Z;
+}
+
+Bolt getBolt(input) {
+  return bolts[input - 1]
+}
+
+void move(int dirPin, int stepPin, float coord) {
+  // Вычисляем направление
+  int sign = coord/(-coord);
+  if (sign > 0) {
+    digitalWrite(dirPin, HIGH);
+  } else {
+    digitalWrite(dirPin, LOW);
+  }
+  // Двигаем
+  int k = coord/revLength;
+  for (int i = 0; i < k * stepsPerRevolution; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(2000);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(2000);
+    }
+}
+
+void setCoord(float x, float z) {
+  move(dirPinX, stepPinX, x);
+  move(dirPinZ, stepPinZ, z);
+}
+
+void home() {
+  // По x
+  digitalWrite(dirPinX, LOW);
+  while( digitalRead(endButX) != 0) {
+    digitalWrite(stepPinX, HIGH);
+    delayMicroseconds(2000);
+    digitalWrite(stepPinX, LOW);
+    delayMicroseconds(2000);
+  }
+  // По Z
+  digitalWrite(dirPinZ, LOW);
+  while( digitalRead(endButZ) != 0) {
+    digitalWrite(stepPinZ, HIGH);
+    delayMicroseconds(2000);
+    digitalWrite(stepPinZ, LOW);
+    delayMicroseconds(2000);
+  }
+}
+
+void loop() {
+  home();
+  // Принять польз. ввод (номер болта)
+  // По номеру болта достать координаты
+  if (Serial.available()){
+    int input = Serial.parseInt();
+    if (input>0&&input<17){
+      Bolt bolt = getBolt(input);
+      // Передать координаты в функцию движения
+      setCoord(bolt.X, bolt.Z);
+    }
+
+}
